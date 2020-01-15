@@ -1,2 +1,2 @@
 # audify
-Web browser sound effects - a browser extension
+Web browsing sound effects - a browser extension

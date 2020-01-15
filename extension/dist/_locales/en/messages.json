@@ -1,0 +1,11 @@
+{
+  "extension_name": {
+    "message": "Audify - Web Browsing Sound Effects"
+  },
+  "extension_short_name": {
+    "message": "Audify"
+  },
+  "extension_description": {
+    "message": "Add web browsing sound effects"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "audify",
+  "version": "1.0.0",
+  "description": "Add web browsing sound effects",
+  "main": "index.js",
+  "scripts": {
+    "build": "rsync -avz dist/ build/ && tsc",
+    "package": "zip -u -r package.zip build/* || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ken107/audify.git"
+  },
+  "author": "Hai Phan <hai.phan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ken107/audify/issues"
+  },
+  "homepage": "https://github.com/ken107/audify#readme",
+  "devDependencies": {
+    "@types/chrome": "0.0.91",
+    "typescript": "^3.7.4"
+  }
+}
