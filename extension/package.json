@@ -4,7 +4,8 @@
   "description": "Add web browsing sound effects",
   "main": "index.js",
   "scripts": {
-    "build": "rsync -avz dist/ build/ && tsc",
+    "compile": "tsc",
+    "build": "rsync -avz dist/ build/",
     "package": "zip -u -r package.zip build/* || true"
   },
   "repository": {

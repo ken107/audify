@@ -5,11 +5,14 @@ interface Rule {
 }
 
 interface Theme {
+  id: number;
+  name: string;
   rules: Rule[];
 }
 
 interface Settings {
-  currentTheme: Theme;
+  myThemes?: Theme[];
+  currentTheme?: Theme;
 }
 
 interface MessagingPeer {
@@ -23,28 +26,21 @@ interface MessagingPeer {
 if (!window.chrome) window.chrome = (<any>window).browser;
 
 const config = {
-  defaultTheme: <Theme>{
-    rules: [
-      {
-        match: "button, input[type=button], input[type=submit]",
-        audioUrl: "https://support2.lsdsoftware.com/diepkhuc-content/sounds/old_school_ringtone.mp3"
-      }
-    ]
-  }
 }
 
 
 function getSettings(): Promise<Settings> {
-  return new Promise(function(fulfill) {
-    chrome.storage.local.get(["currentTheme"], x => fulfill(x as Settings));
-  })
+  return new Promise(f => chrome.storage.local.get(["myThemes", "currentTheme"], x => f(x as Settings)));
 }
 
-function saveSettings(settings: Settings) {
-  return new Promise(function(fulfill) {
-    chrome.storage.local.set(settings, fulfill);
-  })
+function saveSettings(settings: Settings): Promise<void> {
+  return new Promise(f => chrome.storage.local.set(settings, f));
 }
+
+function createTab(url: string): Promise<chrome.tabs.Tab> {
+  return new Promise(f => chrome.tabs.create({url}, f));
+}
+
 
 class ExtensionMessagingPeer implements MessagingPeer {
   onReceive?: (msg: Object) => void;

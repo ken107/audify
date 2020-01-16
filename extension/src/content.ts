@@ -6,7 +6,7 @@
   async function onClick(e: Event) {
     const target = e.target as Element;
     const settings = await getSettings();
-    const rule = (settings.currentTheme || config.defaultTheme).rules.find(rule => target.matches(rule.match));
+    const rule = settings.currentTheme && settings.currentTheme.rules.find(rule => target.matches(rule.match));
     if (rule) peer.invoke(rule.audioUrl);
   }
 })();

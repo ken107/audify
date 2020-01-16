@@ -4,6 +4,13 @@
     <title>Audify Options</title>
     <link rel="stylesheet" type="text/css" href="css/common.css">
     <style>
+      .container-fluid {
+        margin-top: 1.5em;
+        min-width: 400px;
+      }
+      label {
+        font-size: 1rem;
+      }
       #error-text {
         color: red;
         font-weight: bold;
@@ -19,10 +26,13 @@
   <body>
     <div class="container-fluid">
       <div class="form-group">
-        <textarea id="theme-edit" class="form-control" rows="10"></textarea>
+        <label>Current Theme</label>
+        <select id="theme-select" class="form-control">
+          <option value="">Off</option>
+        </select>
       </div>
       <div class="form-group">
-        <button type="button" id="save-btn" class="btn btn-info">Save</button>
+        <button type="button" id="manage-themes-btn" class="btn btn-info">Manage Themes</button>
       </div>
       <div class="form-group">
         <div id="error-text"></div>
