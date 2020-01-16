@@ -2,8 +2,32 @@
 <html>
   <head>
     <title>Audify Options</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <style>
+      #error-text {
+        color: red;
+        font-weight: bold;
+      }
+      #success-text {
+        color: green;
+        font-weight: bold;
+      }
+    </style>
+    <script src="js/common.js"></script>
+    <script src="js/options.js"></script>
   </head>
   <body>
-    This is the extension options page
+    <div class="container-fluid">
+      <div class="form-group">
+        <textarea id="theme-edit" class="form-control" rows="10"></textarea>
+      </div>
+      <div class="form-group">
+        <button type="button" id="save-btn" class="btn btn-info">Save</button>
+      </div>
+      <div class="form-group">
+        <div id="error-text"></div>
+        <div id="success-text"></div>
+      </div>
+    </div>
   </body>
 </html>
