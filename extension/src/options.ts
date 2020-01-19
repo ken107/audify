@@ -6,7 +6,7 @@ window.onload = async function() {
 
   //populate
   const settings = await getSettings();
-  const myThemes = settings.myThemes || [];
+  const myThemes: Theme[] = settings.myThemes || [config.emptyTheme];
   myThemes.forEach((theme, index) => {
     const option = document.createElement("OPTION") as HTMLOptionElement;
     option.value = String(index);
@@ -34,7 +34,10 @@ window.onload = async function() {
 
   async function onManageThemes() {
     try {
-      await createTab("http://localhost:8080/");
+      const manifest = chrome.runtime.getManifest();
+      const script = manifest.content_scripts?.find(s => s.matches?.every(m => m.endsWith("my-themes.html")));
+      if (!script) throw new Error("Manage-themes script not found");
+      await createTab(script.matches![config.isDev ? 0 : 1]);
     }
     catch (err) {
       alert(err.message);

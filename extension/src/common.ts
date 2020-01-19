@@ -5,7 +5,7 @@ interface Rule {
 }
 
 interface Theme {
-  id: number;
+  id: string;
   name: string;
   rules: Rule[];
 }
@@ -26,6 +26,19 @@ interface MessagingPeer {
 if (!window.chrome) window.chrome = (<any>window).browser;
 
 const config = {
+  isDev: !('update_url' in chrome.runtime.getManifest()),
+  emptyTheme: <Theme>{
+    id: "system-empty",
+    name: "Off",
+    rules: []
+  },
+  defaultTheme: <Theme>{
+    id: "system-default",
+    name: "Half-Life",
+    rules: [
+      //TODO
+    ]
+  },
 }
 
 
@@ -46,14 +59,29 @@ class ExtensionMessagingPeer implements MessagingPeer {
   onReceive?: (msg: Object) => void;
   onDisconnect?: () => void;
   constructor(private port: chrome.runtime.Port) {
-    port.onMessage.addListener(msg => this.onReceive && this.onReceive(msg));
-    port.onDisconnect.addListener(() => this.onDisconnect && this.onDisconnect());
+    port.onMessage.addListener(msg => this.onReceive?.(msg));
+    port.onDisconnect.addListener(() => this.onDisconnect?.());
   }
   send(msg: Object) {
     this.port.postMessage(msg);
   }
   disconnect() {
     this.port.disconnect();
+  }
+}
+
+class DocumentMessagingPeer implements MessagingPeer {
+  onReceive?: (msg: Object) => void;
+  onDisconnect?: () => void;
+  constructor(private sendPrefix: string, receivePrefix: string) {
+    document.addEventListener(receivePrefix+"Message", (event: any) => this.onReceive?.(JSON.parse(event.detail)));
+    document.addEventListener(receivePrefix+"Disconnect", () => this.onDisconnect?.());
+  }
+  send(msg: Object) {
+    document.dispatchEvent(new CustomEvent(this.sendPrefix+"Message", {detail: JSON.stringify(msg)}));
+  }
+  disconnect() {
+    document.dispatchEvent(new CustomEvent(this.sendPrefix+"Disconnect"));
   }
 }
 
