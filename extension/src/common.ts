@@ -12,7 +12,7 @@ interface Theme {
 
 interface Settings {
   myThemes?: Theme[];
-  currentTheme?: Theme;
+  currentThemeId?: string;
 }
 
 interface MessagingPeer {
@@ -25,25 +25,28 @@ interface MessagingPeer {
 
 if (!window.chrome) window.chrome = (<any>window).browser;
 
-const config = {
+var config = {
   isDev: !('update_url' in chrome.runtime.getManifest()),
   emptyTheme: <Theme>{
-    id: "system-empty",
+    id: "system-off",
     name: "Off",
     rules: []
   },
   defaultTheme: <Theme>{
-    id: "system-default",
+    id: "system-hl",
     name: "Half-Life",
     rules: [
-      //TODO
+      {match: "button, input[type=button]", "audioUrl": "https://support2.lsdsoftware.com/diepkhuc-content/upload/Boing-sound.mp3"},
     ]
   },
 }
 
 
-function getSettings(): Promise<Settings> {
-  return new Promise(f => chrome.storage.local.get(["myThemes", "currentTheme"], x => f(x as Settings)));
+async function getSettings(): Promise<Settings> {
+  const res = await new Promise<Settings>(f => chrome.storage.local.get(["myThemes", "currentThemeId"], x => f(x as Settings)));
+  if (!res.myThemes) res.myThemes = [config.emptyTheme, config.defaultTheme];
+  if (!res.currentThemeId) res.currentThemeId = config.defaultTheme.id;
+  return res;
 }
 
 function saveSettings(settings: Settings): Promise<void> {
@@ -55,7 +58,7 @@ function createTab(url: string): Promise<chrome.tabs.Tab> {
 }
 
 
-class ExtensionMessagingPeer implements MessagingPeer {
+var ExtensionMessagingPeer = class implements MessagingPeer {
   onReceive?: (msg: Object) => void;
   onDisconnect?: () => void;
   constructor(private port: chrome.runtime.Port) {
@@ -70,7 +73,7 @@ class ExtensionMessagingPeer implements MessagingPeer {
   }
 }
 
-class DocumentMessagingPeer implements MessagingPeer {
+var DocumentMessagingPeer = class implements MessagingPeer {
   onReceive?: (msg: Object) => void;
   onDisconnect?: () => void;
   constructor(private sendPrefix: string, receivePrefix: string) {
@@ -85,7 +88,7 @@ class DocumentMessagingPeer implements MessagingPeer {
   }
 }
 
-class RpcPeer {
+var RpcPeer = class {
   private idGen: number;
   private pending: {[key: string]: {fulfill: (value: any) => void, reject: (reason: any) => void}};
   onInvoke?: (...args: any[]) => any;

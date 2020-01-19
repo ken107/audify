@@ -6,13 +6,14 @@ window.onload = async function() {
 
   //populate
   const settings = await getSettings();
-  const myThemes: Theme[] = settings.myThemes || [config.emptyTheme];
-  myThemes.forEach((theme, index) => {
+  settings.myThemes?.forEach((theme, index) => {
     const option = document.createElement("OPTION") as HTMLOptionElement;
-    option.value = String(index);
+    option.value = theme.id;
     option.innerHTML = theme.name;
     themeSelect.appendChild(option);
   })
+
+  if (settings.currentThemeId) themeSelect.value = settings.currentThemeId;
 
   //events
   themeSelect.addEventListener("change", onThemeChanged);
@@ -23,8 +24,7 @@ window.onload = async function() {
     try {
       errorText.innerText =
       successText.innerText = "";
-      const selectedIndex = Number(themeSelect.value);
-      await saveSettings({currentTheme: myThemes[selectedIndex]});
+      await saveSettings({currentThemeId: themeSelect.value});
       successText.innerText = "Saved!";
     }
     catch (err) {
@@ -34,13 +34,14 @@ window.onload = async function() {
 
   async function onManageThemes() {
     try {
-      const manifest = chrome.runtime.getManifest();
-      const script = manifest.content_scripts?.find(s => s.matches?.every(m => m.endsWith("my-themes.html")));
-      if (!script) throw new Error("Manage-themes script not found");
+      errorText.innerText =
+      successText.innerText = "";
+      const script = chrome.runtime.getManifest().content_scripts?.find(s => s.matches?.every(m => m.endsWith("/my-themes.html")));
+      if (!script) throw new Error("Manage-themes content-script declaration not found");
       await createTab(script.matches![config.isDev ? 0 : 1]);
     }
     catch (err) {
-      alert(err.message);
+      errorText.innerText = err.message;
     }
   }
 }

@@ -31,6 +31,7 @@
   },
   "content_scripts": [
     {
+      "run_at": "document_start",
       "matches": [
         "http://localhost:8080/my-themes.html",
         "https://audify.lsdsoftware.com/my-themes.html"

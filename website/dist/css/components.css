@@ -1,0 +1,22 @@
+
+.breadcrumb .breadcrumb-item:not(.active) {
+    cursor: pointer;
+}
+
+
+.manage-themes-page .actions {
+    white-space: nowrap;
+    text-align: right;
+}
+.manage-themes-page .actions > .material-icons {
+    cursor: pointer;
+}
+
+
+.edit-theme-page .actions {
+    white-space: nowrap;
+    text-align: right;
+}
+.edit-theme-page .actions > .material-icons {
+    cursor: pointer;
+}

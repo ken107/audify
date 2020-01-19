@@ -4,23 +4,21 @@
     <title>My Themes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/components.css">
 
-    <style>
-      .actions > .material-icons {
-        cursor: pointer;
-      }
-    </style>
-
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>    <script src="https://assets.lsdsoftware.com/databind.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>    <script src="https://assets.lsdsoftware.com/read-aloud/page-scripts/messaging.js"></script>
+    <script src="js/components.js"></script>
 
     <script>
-      const peer = new RpcPeer(new DocumentMessagingPeer("ManageThemesService", "ManageThemesClient"));
+      var peer = new RpcPeer(new DocumentMessagingPeer("ManageThemesService", "ManageThemesClient"));
       settings = null;
+      page = "manage-themes";
       $(startup);
 
       function startup() {
+        loadComponents();
         peer.invoke("getSettings").then(function(res) {settings = res});
       }
 
@@ -28,47 +26,99 @@
         peer.invoke("saveSettings", [{myThemes: settings.myThemes}]).catch(console.error);
       }
 
-      function removeTheme(index) {
-        if (confirm("Are you sure you want to remove " + settings.myThemes[index].name + "?")) {
-          settings.myThemes.splice(index, 1);
+      function uuidv4() {
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, function(c) {
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        })
+      }
+
+      function loadComponents() {
+        $("<div>").load("components.html", function() {
+          $(this).children().each(function() {
+            var className = $(this).data("class");
+            if (!className || !window[className]) throw new Error("Missing class " + className);
+            dataBinder.views[className] = {template: this, controller: window[className]};
+          })
+        })
+      }
+
+
+      // ManageThemesPage
+      manageThemesPage = {
+        onDelete: function(index) {
+          if (confirm("Are you sure you want to remove " + settings.myThemes[index].name + "?")) {
+            settings.myThemes.splice(index, 1);
+            saveSettings();
+          }
+        },
+        onEdit: function(index) {
+          editThemePage.item = JSON.parse(JSON.stringify(settings.myThemes[index]));
+          page = "edit-theme";
+        },
+        onCopy: function(index) {
+          var clone = JSON.parse(JSON.stringify(settings.myThemes[index]));
+          clone.id = uuidv4();
+          while (settings.myThemes.some(x => x.name == clone.name)) clone.name = this.incrementVersion(clone.name);
+          settings.myThemes.push(clone);
           saveSettings();
+        },
+        incrementVersion: function(name) {
+          var match = / \((\d+)\)$/.exec(name);
+          if (match) return name.slice(0, -match[0].length) + " (" + (Number(match[1]) +1) + ")";
+          else return name + " (2)";
         }
       }
 
-      function editTheme(index) {
+
+      //Breadcrumbs
+      breadcrumb = {
+        crumbs: null,
+        refresh: function() {
+          this.crumbs = [{label: "Audify"}, {page: "manage-themes", label: "Manage Themes"}];
+          if (page == "edit-theme") this.crumbs.push({label: editThemePage.item.name});
+        },
+        onSelect: function(crumb) {
+          if (crumb.page) page = crumb.page;
+        }
       }
 
-      function cloneTheme(index) {
-        const clone = JSON.parse(JSON.stringify(settings.myThemes[index]));
-        clone.id = null;
-        settings.myThemes.push(clone);
-        saveSettings();
+
+      //EditThemePage
+      editThemePage = {
+        item: null,
+        onSave: function() {
+          var id = this.item.id;
+          var index = settings.myThemes.findIndex(function(x) {return x.id == id});
+          if (index != -1) {
+            settings.myThemes[index] = this.item;
+            saveSettings();
+            page = "manage-themes";
+          }
+        },
+        onCancel: function() {
+          page = "manage-themes";
+        }
       }
     </script>
   </head>
-  <body>
+  <body bind-statement-1="breadcrumb.refresh(#page)">
     <div class="container">
-      <table class="table">
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th></th>
-        </tr>
-        <tr bind-repeater-i="#settings.myThemes.length" bind-var-item="#settings.myThemes[#i]">
-          <td>{{#item.id}}</td>
-          <td>{{#item.name}}</td>
-          <td class="actions" bind-var-is-system-theme="/^system-/.test(#item.id)">
-            <i class="material-icons"
-              bind-statement-1="$(thisElem).toggle(!#isSystemTheme)"
-              bind-event-click="this.removeTheme(#i)">trash</i>
-            <i class="material-icons"
-              bind-statement-1="$(thisElem).toggle(!#isSystemTheme)"
-              bind-event-click="this.editTheme(#i)">edit</i>
-            <i class="material-icons"
-              bind-event-click="this.cloneTheme(#i)">file_copy</i>
-          </td>
-        </tr>
-      </table>
+      <div bind-view="Breadcrumb"
+        bind-param-crumbs="#breadcrumb.crumbs"
+        bind-event-select-item="breadcrumb.onSelect(event.data)"></div>
+
+      <div bind-view="ManageThemesPage"
+        bind-param-items="#settings.myThemes"
+        bind-statement-1="$(thisElem).toggle(#page == 'manage-themes')"
+        bind-event-delete-item="manageThemesPage.onDelete(event.data)"
+        bind-event-edit-item="manageThemesPage.onEdit(event.data)"
+        bind-event-copy-item="manageThemesPage.onCopy(event.data)"></div>
+
+      <div bind-view="EditThemePage"
+        bind-param-item="#editThemePage.item"
+        bind-statement-1="$(thisElem).toggle(#page == 'edit-theme')"
+        bind-event-save="editThemePage.onSave()"
+        bind-event-cancel="editThemePage.onCancel()"></div>
     </div>
   </body>
 </html>
