@@ -1,13 +1,14 @@
-(function() {
+(async function() {
   const peer = new RpcPeer(new ExtensionMessagingPeer(chrome.runtime.connect()));
-  document.body.addEventListener("click", onClick);
+  const settings = await getSettings();
+  const theme = settings.myThemes?.find(x => x.id == settings.currentThemeId);
+  const eventTypes = theme?.rules.reduce((ag, x) => ag.add(x.eventType), new Set<string>());
+  eventTypes?.forEach(x => document.body.addEventListener(x, onEvent));
 
 
-  async function onClick(e: Event) {
+  function onEvent(e: Event) {
     const target = e.target as Element;
-    const settings = await getSettings();
-    const theme = settings.myThemes?.find(x => x.id == settings.currentThemeId);
-    const rule = theme?.rules.find(rule => target.matches(rule.match));
+    const rule = theme?.rules.find(x => x.eventType == e.type && target.matches(x.cssSelector));
     if (rule) peer.invoke(rule.audioUrl);
   }
 })();

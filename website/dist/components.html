@@ -8,12 +8,6 @@
 
 <div data-class="ManageThemesPage" class="manage-themes-page" bind-var-view-root="thisElem">
     <table class="table">
-        <thead class="thead-light">
-            <tr>
-                <th>Name</th>
-                <th></th>
-            </tr>
-        </thead>
         <tbody>
             <tr bind-repeater-i="#items.length" bind-var-item="#items[#i]">
                 <td>
@@ -35,10 +29,6 @@
 
 <div data-class="EditThemePage" class="edit-theme-page" bind-var-view-root="thisElem">
     <div class="form-group">
-        <span class="text-muted">ID:</span>
-        <input type="text" class="form-control" disabled bind-statement-1="thisElem.value = #item.id" />
-    </div>
-    <div class="form-group">
         <span class="text-muted">Name:</span>
         <input type="text" class="form-control" bind-statement-1="thisElem.value = #item.name" bind-event-change="#item.name = thisElem.value" />
     </div>
@@ -48,29 +38,41 @@
             <thead>
                 <tr>
                     <th>CSS selector</th>
+                    <th>Event</th>
                     <th>Sound URL</th>
                     <th style="width: 1%;"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr bind-repeater-i="#item.rules.length" bind-var-item="#item.rules[#i]">
-                    <td>{{#item.match}}</td>
-                    <td>{{#item.audioUrl}}</td>
+                <tr bind-repeater-i="#item.rules.length" bind-var-rule="#item.rules[#i]">
+                    <td>{{#rule.cssSelector}}</td>
+                    <td>{{#rule.eventType}}</td>
+                    <td>{{#rule.audioUrl}}</td>
                     <td class="actions">
-                        <i class="material-icons">delete</i>
+                        <i class="material-icons" bind-event-click="#item.rules.splice(#i, 1)">delete</i>
                     </td>
                 </tr>
             </tbody>
             <tfoot>
-                <tr>
+                <tr bind-var-new-rule="{}">
                     <td>
-                        <input type="text" class="form-control" />
+                        <input type="text" class="form-control"
+                            bind-statement-1="thisElem.value = #newRule.cssSelector || ''"
+                            bind-event-change="#newRule.cssSelector = thisElem.value" />
                     </td>
                     <td>
-                        <input type="text" class="form-control" />
+                        <input type="text" class="form-control"
+                            bind-statement-1="thisElem.value = #newRule.eventType || ''"
+                            bind-event-change="#newRule.eventType = thisElem.value" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control"
+                            bind-statement-1="thisElem.value = #newRule.audioUrl || ''"
+                            bind-event-change="#newRule.audioUrl = thisElem.value" />
                     </td>
                     <td class="actions">
-                        <i class="material-icons">add_box</i>
+                        <i class="material-icons"
+                            bind-event-click="if (#newRule.cssSelector && #newRule.eventType && #newRule.audioUrl) {#item.rules.push(#newRule); #newRule = {}}">add_box</i>
                     </td>
                 </tr>
             </tfoot>

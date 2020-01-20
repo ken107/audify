@@ -1,6 +1,7 @@
 
 interface Rule {
-  match: string;
+  cssSelector: string;
+  eventType: string;
   audioUrl: string;
 }
 
@@ -36,7 +37,7 @@ var config = {
     id: "system-hl",
     name: "Half-Life",
     rules: [
-      {match: "button, input[type=button]", "audioUrl": "https://support2.lsdsoftware.com/diepkhuc-content/upload/Boing-sound.mp3"},
+      {cssSelector: "button, input[type=button]", eventType: "click", audioUrl: "https://support2.lsdsoftware.com/diepkhuc-content/upload/Boing-sound.mp3"},
     ]
   },
 }
