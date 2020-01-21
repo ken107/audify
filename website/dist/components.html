@@ -27,7 +27,7 @@
 </div>
 
 
-<div data-class="EditThemePage" class="edit-theme-page" bind-var-view-root="thisElem">
+<div data-class="EditThemePage" class="edit-theme-page" bind-var-view-root="thisElem" bind-var-show-upload-dialog="false">
     <div class="form-group">
         <span class="text-muted">Name:</span>
         <input type="text" class="form-control" bind-statement-1="thisElem.value = #item.name" bind-event-change="#item.name = thisElem.value" />
@@ -49,6 +49,9 @@
                     <td>{{#rule.eventType}}</td>
                     <td>{{#rule.audioUrl}}</td>
                     <td class="actions">
+                        <i class="material-icons"
+                            bind-var-audio="document.createElement('AUDIO')"
+                            bind-event-click="var x=#audio; x.src=#rule.audioUrl; x.play()">play_circle_filled</i>
                         <i class="material-icons" bind-event-click="#item.rules.splice(#i, 1)">delete</i>
                     </td>
                 </tr>
@@ -66,13 +69,19 @@
                             bind-event-change="#newRule.eventType = thisElem.value" />
                     </td>
                     <td>
-                        <input type="text" class="form-control"
-                            bind-statement-1="thisElem.value = #newRule.audioUrl || ''"
-                            bind-event-change="#newRule.audioUrl = thisElem.value" />
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                bind-statement-1="thisElem.value = #newRule.audioUrl || ''"
+                                bind-event-change="#newRule.audioUrl = thisElem.value" />
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    bind-event-click="#showUploadDialog = true">Upload</button>
+                            </div>
+                        </div>
                     </td>
                     <td class="actions">
-                        <i class="material-icons"
-                            bind-event-click="if (#newRule.cssSelector && #newRule.eventType && #newRule.audioUrl) {#item.rules.push(#newRule); #newRule = {}}">add_box</i>
+                        <button type="button" class="btn btn-secondary"
+                            bind-event-click="if (#newRule.cssSelector && #newRule.eventType && #newRule.audioUrl) {#item.rules.push(#newRule); #newRule = {}}">Add</button>
                     </td>
                 </tr>
             </tfoot>
@@ -81,5 +90,45 @@
     <div class="form-group">
         <button type="button" class="btn btn-primary" bind-event-click="$(#viewRoot).triggerHandler('save')">Save</button>
         <button type="button" class="btn btn-light" bind-event-click="$(#viewRoot).triggerHandler('cancel')">Cancel</button>
+    </div>
+    <div bind-view="UploadSoundDialog"
+        bind-param-visible="#showUploadDialog"></div>
+</div>
+
+
+<div data-class="UploadSoundDialog" class="upload-sound-dialog modal fade" tabindex="-1" role="dialog" aria-hidden="true"
+    bind-var-progress="0"
+    bind-statement-1="$(thisElem).modal(#visible ? 'show' : 'hide')"
+    bind-event-hidden.bs.modal="#visible = false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="https://" bind-var-selected-file="null">
+                <div class="modal-header">
+                    <strong class="modal-title">Upload Sound</strong>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="file" name="soundFile" accept="audio/*"
+                        bind-event-change="#selectedFile = thisElem.files[0]" />
+                </div>
+                <div class="modal-footer">
+                    <img src="/images/waiticon.gif" style="height: 2em;"
+                        bind-statement-1="$(thisElem).toggle(!!#progress)" />
+                    <button type="button" class="btn btn-outline-secondary"
+                        bind-statement-1="$(thisElem).toggle(!#progress && !!#selectedFile)"
+                        bind-event-click="this.playSound(#selectedFile)">
+                        <i class="material-icons">play_circle_outline</i>
+                        Listen
+                    </button>
+                    <button type="submit" class="btn btn-primary"
+                        bind-statement-1="$(thisElem).toggle(!#progress)">
+                        <i class="material-icons">check</i>
+                        OK
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

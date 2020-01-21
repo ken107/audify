@@ -1,4 +1,9 @@
 
+.material-icons {
+    vertical-align: middle;
+}
+
+
 .breadcrumb .breadcrumb-item:not(.active) {
     cursor: pointer;
 }
