@@ -27,7 +27,7 @@
 </div>
 
 
-<div data-class="EditThemePage" class="edit-theme-page" bind-var-view-root="thisElem" bind-var-show-upload-dialog="false">
+<div data-class="EditThemePage" class="edit-theme-page" bind-var-view-root="thisElem" bind-var-show-upload-dialog="false" bind-var-new-rule="{}">
     <div class="form-group">
         <span class="text-muted">Name:</span>
         <input type="text" class="form-control" bind-statement-1="thisElem.value = #item.name" bind-event-change="#item.name = thisElem.value" />
@@ -57,7 +57,7 @@
                 </tr>
             </tbody>
             <tfoot>
-                <tr bind-var-new-rule="{}">
+                <tr>
                     <td>
                         <input type="text" class="form-control"
                             bind-statement-1="thisElem.value = #newRule.cssSelector || ''"
@@ -92,17 +92,17 @@
         <button type="button" class="btn btn-light" bind-event-click="$(#viewRoot).triggerHandler('cancel')">Cancel</button>
     </div>
     <div bind-view="UploadSoundDialog"
-        bind-param-visible="#showUploadDialog"></div>
+        bind-param-visible="#showUploadDialog"
+        bind-event-success="#newRule.audioUrl=event.data; #showUploadDialog=false"></div>
 </div>
 
 
 <div data-class="UploadSoundDialog" class="upload-sound-dialog modal fade" tabindex="-1" role="dialog" aria-hidden="true"
-    bind-var-progress="0"
     bind-statement-1="$(thisElem).modal(#visible ? 'show' : 'hide')"
     bind-event-hidden.bs.modal="#visible = false">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="https://" bind-var-selected-file="null">
+            <form bind-var-selected-file="null" bind-event-submit="this.upload(thisElem); return false">
                 <div class="modal-header">
                     <strong class="modal-title">Upload Sound</strong>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -112,10 +112,11 @@
                 <div class="modal-body">
                     <input type="file" name="soundFile" accept="audio/*"
                         bind-event-change="#selectedFile = thisElem.files[0]" />
+                    <div class="alert alert-danger mt-3" bind-statement-1="$(thisElem).toggle(!!#error)">{{#errorMessages[#error] || #error}}</div>
                 </div>
                 <div class="modal-footer">
-                    <img src="/images/waiticon.gif" style="height: 2em;"
-                        bind-statement-1="$(thisElem).toggle(!!#progress)" />
+                    <span class="spinner" style="width: 2em; height: 2em;"
+                        bind-statement-1="$(thisElem).toggle(!!#progress)"></span>
                     <button type="button" class="btn btn-outline-secondary"
                         bind-statement-1="$(thisElem).toggle(!#progress && !!#selectedFile)"
                         bind-event-click="this.playSound(#selectedFile)">
@@ -123,6 +124,7 @@
                         Listen
                     </button>
                     <button type="submit" class="btn btn-primary"
+                        bind-statement-2="thisElem.disabled = !#selectedFile"
                         bind-statement-1="$(thisElem).toggle(!#progress)">
                         <i class="material-icons">check</i>
                         OK
