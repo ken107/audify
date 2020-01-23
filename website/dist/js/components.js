@@ -49,3 +49,34 @@ function UploadSoundDialog(viewRoot) {
         })
     }
 }
+
+function BrowseSoundDialog(viewRoot) {
+    var self = this;
+    var audio = document.createElement("AUDIO");
+    this.items = null;
+    this.progress = 0;
+    this.loadItems = function() {
+        this.progress++;
+        $.ajax({
+            url: "https://support2.lsdsoftware.com/audify/list-library-sounds?collectionId=adobe-multimedia",
+            success: function(items) {
+				self.progress--;
+                self.items = items;
+            },
+            error: function(err) {
+				self.progress--;
+				console.log(err);
+            }
+        })
+    }
+    this.playItem = function(item) {
+        audio.src = getSoundUrl(item);
+        audio.play();
+    }
+    this.selectItem = function(item) {
+        $(viewRoot).triggerHandler("success", getSoundUrl(item));
+    }
+    function getSoundUrl(item) {
+        return "https://support2.lsdsoftware.com/audify/download-library-sound?collectionId=adobe-multimedia&fileId=" + item;
+    }
+}

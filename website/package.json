@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Main website",
   "scripts": {
+    "deploy": "aws s3 sync --profile s3 --delete --metadata-directive REPLACE --cache-control max-age=3600,public dist s3://audify-content/website",
     "start": "hs dist"
   },
   "author": "Hai Phan <hai.phan@gmail.com>",

@@ -27,7 +27,11 @@
 </div>
 
 
-<div data-class="EditThemePage" class="edit-theme-page" bind-var-view-root="thisElem" bind-var-show-upload-dialog="false" bind-var-new-rule="{}">
+<div data-class="EditThemePage" class="edit-theme-page"
+    bind-var-view-root="thisElem"
+    bind-var-show-upload-dialog="false"
+    bind-var-show-browse-dialog="false"
+    bind-var-new-rule="{}">
     <div class="form-group">
         <span class="text-muted">Name:</span>
         <input type="text" class="form-control" bind-statement-1="thisElem.value = #item.name" bind-event-change="#item.name = thisElem.value" />
@@ -74,8 +78,12 @@
                                 bind-statement-1="thisElem.value = #newRule.audioUrl || ''"
                                 bind-event-change="#newRule.audioUrl = thisElem.value" />
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-secondary"
-                                    bind-event-click="#showUploadDialog = true">Upload</button>
+                                <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
+                                </button>
+                                <div class="dropdown-menu">
+                                    <button type="button" class="dropdown-item" bind-event-click="#showBrowseDialog = true">Browse sound library</button>
+                                    <button type="button" class="dropdown-item" bind-event-click="#showUploadDialog = true">Upload sound</button>
+                                </div>
                             </div>
                         </div>
                     </td>
@@ -91,6 +99,9 @@
         <button type="button" class="btn btn-primary" bind-event-click="$(#viewRoot).triggerHandler('save')">Save</button>
         <button type="button" class="btn btn-light" bind-event-click="$(#viewRoot).triggerHandler('cancel')">Cancel</button>
     </div>
+    <div bind-view="BrowseSoundDialog"
+        bind-param-visible="#showBrowseDialog"
+        bind-event-success="#newRule.audioUrl=event.data; #showBrowseDialog=false"></div>
     <div bind-view="UploadSoundDialog"
         bind-param-visible="#showUploadDialog"
         bind-event-success="#newRule.audioUrl=event.data; #showUploadDialog=false"></div>
@@ -131,6 +142,38 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+
+<div data-class="BrowseSoundDialog" class="browse-sound-dialog modal fade" tabindex="-1" role="dialog" aria-hidden="true"
+    bind-statement-1="$(thisElem).modal(#visible ? 'show' : 'hide'); if (#visible && !#items) this.loadItems()"
+    bind-event-hidden.bs.modal="#visible = false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong class="modal-title">Browse</strong>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="spinner" style="width: 2em; height: 2em;" bind-statement-1="$(thisElem).toggle(!!#progress)"></div>
+                <table class="table table-sm">
+                    <tr bind-repeater-i="#items.length" bind-var-item="#items[#i]">
+                        <td>{{#item}}</td>
+                        <td class="actions">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" bind-event-click="this.playItem(#item)">
+                                <i class="material-icons">play_circle_outline</i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" bind-event-click="this.selectItem(#item)">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>
