@@ -2,8 +2,8 @@
 
 Last updated: 2026-10-30
 
-Audify plays a short sound when you press a button, hover over a button, or click a link on a
-web page. It does this entirely inside your browser.
+Audify plays a short sound when you press a button, click a link, or hover over a button or link
+on a web page. It does this entirely inside your browser.
 
 **What Audify reads on web pages.** On each page, Audify notices when you press, hover over, or
 activate (with Enter or Space) a button or link, so it knows when to play a sound. It does not read,

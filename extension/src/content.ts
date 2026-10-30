@@ -37,13 +37,12 @@
 
   function onPointerOver(e: PointerEvent) {
     if (e.pointerType != "mouse") return;
-    const hit = findTarget(e);
-    const button = hit?.kind == "button" ? hit.elem : null;
-    if (button && button != lastHovered && e.timeStamp - lastHoverTime > 40) {
+    const target = findTarget(e)?.elem ?? null;
+    if (target && target != lastHovered && e.timeStamp - lastHoverTime > 40) {
       lastHoverTime = e.timeStamp;
       play("buttonHover");
     }
-    lastHovered = button;
+    lastHovered = target;
   }
 
   function play(kind: ActionKind) {
