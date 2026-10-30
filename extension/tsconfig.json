@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "types": ["chrome"],
     "strict": true,
-    "moduleResolution": "node",
-    "declaration": false,
-    "newLine": "LF",
+    "newLine": "lf",
     "rootDir": "src",
     "outDir": "build/js"
   },
