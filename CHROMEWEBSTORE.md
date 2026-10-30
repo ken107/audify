@@ -59,8 +59,8 @@ English
 2. Toolbar popup next to a one-line pitch: per-action switches, per-site mute, volume.
 3. Settings page in dark mode.
 
-Regenerate after UI changes. The icon (ABC blocks) predates the sound focus; a sound-themed icon
-would make the listing clearer.
+Regenerate after UI changes. Icon sources are SVGs in `store/icon-source/` (`icon.svg` for 48 and
+128 px, `icon-small.svg` for the 16 and 32 px toolbar sizes).
 
 ## Permissions Justification
 
