@@ -478,20 +478,17 @@ class SoundPlayer {
   private master?: GainNode;
   private idleTimer?: number;
 
-  play(soundId: string) {
+  async play(soundId: string) {
     const def = soundsById.get(soundId);
     if (!def || this.volume <= 0) return;
     const ctx = this.getContext();
-    if (ctx.state == "running") {
-      this.render(def);
-    }
-    else {
+    if (ctx.state != "running") {
       //resume() waits for user activation; drop the sound if it would come out late
       const requested = performance.now();
-      ctx.resume().then(() => {
-        if (performance.now() - requested < 150) this.render(def);
-      }, () => {});
+      try { await ctx.resume() } catch { return }
+      if (performance.now() - requested > 150) return;
     }
+    this.render(def);
   }
 
   private render(def: SoundDef) {

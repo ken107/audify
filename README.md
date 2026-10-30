@@ -23,5 +23,7 @@ npm run build      # outputs the unpacked extension to extension/build
 npm run package    # zips build/ into package.zip for store upload
 ```
 
+Store listing copy, permission justifications and screenshots are in [CHROMEWEBSTORE.md](CHROMEWEBSTORE.md) and `store/`; the privacy policy is [PRIVACY.md](PRIVACY.md).
+
 Load `extension/build` as an unpacked extension (Chrome: `chrome://extensions`, Developer mode,
 Load unpacked).
