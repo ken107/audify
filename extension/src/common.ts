@@ -17,8 +17,8 @@ interface Settings {
 
 const actionLabels: Record<ActionKind, string> = {
   buttonClick: "Button click",
-  buttonHover: "Hover",
   linkClick: "Link click",
+  buttonHover: "Hover",
 }
 
 const defaultSettings: Settings = {
