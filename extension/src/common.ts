@@ -33,6 +33,15 @@ const defaultSettings: Settings = {
   disabledSites: [],
 }
 
+//asks the offscreen document to play a sound; see background.ts
+interface PlayMessage {
+  type: "play";
+  soundId: string;
+  volume: number;
+  varyPitch: boolean;
+  time: number;   //Date.now() when requested, so a sound that would come out late can be dropped
+}
+
 //elements that count as buttons and links, checked innermost-first along the event path
 const buttonSelector = "button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role=button], summary"
 const linkSelector = "a[href], area[href], [role=link]"

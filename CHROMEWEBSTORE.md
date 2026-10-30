@@ -68,6 +68,7 @@ would make the listing clearer.
 |------------|------|---------------|
 | `storage` | permissions | Saves the user's Audify settings (on/off, chosen sound for each action, volume, pitch variation, muted sites) and syncs them across the user's signed-in browsers. |
 | `activeTab` | permissions | When the user opens the toolbar popup, Audify reads the current tab's domain name to show a "Sounds on this site" switch, so the user can mute Audify on that site. The domain is only shown and, if the user mutes it, saved to their own settings. |
+| `offscreen` | permissions | Audify plays its sounds from a hidden extension page so they can play as soon as a page loads, including hover sounds before the user has clicked anything on that page. The page only generates audio; it has no access to web pages or user data. |
 | Content script on `<all_urls>` | host access | Audify's single purpose is to play a sound when the user presses a button or clicks a link on any website, so it must run on every site the user visits. The script only listens for pointer and keyboard events on buttons and links and plays a locally generated sound. It does not read page content, change the page, or send any data anywhere. Users can mute it per site or turn it off entirely. |
 
 ## Privacy & Data Use
@@ -123,7 +124,7 @@ https://github.com/ken107/audify/blob/master/PRIVACY.md (live once this branch i
 ## Review Notes
 
 ### Known Issues / Limitations
-- Sounds start after the user's first interaction with a page (browser autoplay rules), so hover sounds stay silent on a freshly loaded page until the user clicks or presses a key there.
+- In browsers without offscreen documents (Firefox), sounds play inside the page and are subject to its autoplay rules, so hover sounds stay silent until the user first clicks or presses a key there.
 - Content scripts can't run on browser pages (chrome://, the Web Store), so those pages have no sounds.
 
 ### Rejection History
