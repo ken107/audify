@@ -6,11 +6,11 @@
   --border: #e3e0d8;
   --text: #22201c;
   --muted: #6f6a60;
-  --accent: #e2563b;
+  --accent: #c2412a;
   --accent-soft: #fbe4dd;
   --accent-text: #ffffff;
-  --track: #cfcac0;
-  --focus: #e2563b66;
+  --track: #8f897f;
+  --focus: #c2412a80;
   --shadow: 0 1px 2px rgb(0 0 0 / .05), 0 2px 8px rgb(0 0 0 / .04);
 }
 
@@ -25,7 +25,7 @@
     --accent: #f0745a;
     --accent-soft: #46271f;
     --accent-text: #1b1210;
-    --track: #4a463f;
+    --track: #77726a;
     --focus: #f0745a77;
     --shadow: none;
   }
@@ -39,7 +39,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 0.875rem/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   accent-color: var(--accent);
 }
 
@@ -80,12 +80,12 @@ button, select, input {
   height: 32px;
 }
 .brand h1 {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 650;
   letter-spacing: -.01em;
 }
 .brand p {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 
@@ -277,7 +277,7 @@ body.options {
   height: 40px;
 }
 .options .brand h1 {
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 
 .layout {
@@ -291,7 +291,7 @@ body.options {
   top: 24px;
 }
 .col-title {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 650;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -309,7 +309,7 @@ body.options {
   padding: 12px 14px;
 }
 #disabled-sites p {
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .site-chip {
   display: inline-flex;
@@ -319,17 +319,17 @@ body.options {
   border-radius: 999px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .chip-remove {
   border: 0;
   background: none;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   cursor: pointer;
   color: var(--muted);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1;
 }
 .chip-remove:hover {
@@ -341,7 +341,7 @@ body.options {
   margin-top: 28px;
 }
 .category h2 {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 650;
 }
 .category > p {
@@ -356,6 +356,7 @@ body.options {
 .sound-card {
   display: grid;
   grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
   gap: 10px 12px;
   padding: 12px;
   background: var(--surface);
@@ -386,21 +387,23 @@ body.options {
   font-weight: 600;
 }
 .sound-desc {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--muted);
 }
 .assign {
   grid-column: 1 / -1;
+  align-items: center;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
 .chip {
+  min-block-size: 28px;
   padding: 3px 10px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: transparent;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--muted);
   cursor: pointer;
 }
@@ -428,4 +431,26 @@ body.options {
 
 [hidden] {
   display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* Windows high contrast and other forced-colors modes drop backgrounds, so draw the switch with borders */
+@media (forced-colors: active) {
+  .switch-track {
+    border: 1px solid CanvasText;
+  }
+  .switch-track::after {
+    background: CanvasText;
+  }
+  .switch input:checked + .switch-track {
+    background: Highlight;
+  }
+  .chip[aria-pressed=true] {
+    border: 2px solid Highlight;
+  }
 }
