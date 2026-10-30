@@ -1,3 +1,4 @@
+//buttonHover covers links too; the key keeps its original name so saved settings carry over
 type ActionKind = "buttonClick" | "buttonHover" | "linkClick";
 
 interface ActionSetting {
@@ -16,7 +17,7 @@ interface Settings {
 
 const actionLabels: Record<ActionKind, string> = {
   buttonClick: "Button click",
-  buttonHover: "Button hover",
+  buttonHover: "Hover",
   linkClick: "Link click",
 }
 

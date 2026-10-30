@@ -1,7 +1,7 @@
 # Audify
 
 Web browsing sound effects, as a browser extension. Audify plays a short sound when you press a
-button, and optionally when you hover a button or click a link, on every website. It's meant for
+button, and optionally when you click a link or hover over a button or link, on every website. It's meant for
 people who rely on sound to know their input registered.
 
 ## How it works

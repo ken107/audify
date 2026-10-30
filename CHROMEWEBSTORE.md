@@ -11,15 +11,15 @@ Copy-paste source for the Chrome Web Store Developer Dashboard. Keep it in sync 
 Audify - Web Browsing Sound Effects
 
 **Short Description** (132 max)
-Instant sound feedback when you press buttons, hover over them, or click links, on every website.
+Instant sound feedback when you press buttons, click links, or hover over them, on every website.
 
 **Detailed Description**
-Audify plays a short, instant sound whenever you press a button on a web page, so you always know your click registered. Optionally, it can also play a sound when you hover over a button or click a link.
+Audify plays a short, instant sound whenever you press a button on a web page, so you always know your click registered. Optionally, it can also play a sound when you click a link or hover over a button or link.
 
 Built for people who rely on sound. Many of us notice a missing click sound more than a missing visual change. Audify gives every button and link the kind of audible response physical controls have, with no noticeable delay.
 
 47 sounds to choose from: crisp ticks, taps, pops, wood blocks, typewriter and keyboard clicks, quiet hover blips, chimes and swooshes for links, comical sounds such as boink, quack, honk, kazoo and slide whistle, and retro 8-bit bleeps like menu cursors, jumps and power-ups.
-Separate sound choices for button presses, button hovers and link clicks.
+Separate sound choices for button presses, link clicks and hovers.
 Works with the keyboard too: pressing Enter or Space on a button or link plays its sound.
 Volume control and optional slight pitch variation, so repeated sounds feel natural.
 Mute Audify on any site with one switch from the toolbar.
@@ -38,7 +38,7 @@ Feedback and bug reports: https://github.com/ken107/audify/issues
 Accessibility
 
 **Single Purpose**
-Plays a short sound effect when the user presses a button, hovers over a button, or clicks a link on a web page.
+Plays a short sound effect when the user presses a button, clicks a link, or hovers over a button or link on a web page.
 
 **Primary Language**
 English
