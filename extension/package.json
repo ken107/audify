@@ -4,8 +4,8 @@
   "description": "Instant synthesized sound effects for buttons and links on every website",
   "scripts": {
     "compile": "tsc",
-    "build": "rm -rf build && mkdir -p build && cp -R dist/. build/ && tsc",
-    "package": "rm -f package.zip && npm run build && cd build && zip -r ../package.zip ."
+    "build": "node scripts/build.mjs copy && tsc",
+    "package": "npm run build && node scripts/build.mjs zip"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,8 @@
   "devDependencies": {
     "@types/chrome": "^0.3.7",
     "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
