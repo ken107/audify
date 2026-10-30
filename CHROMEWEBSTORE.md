@@ -47,7 +47,7 @@ English
 
 | Asset | Dimensions | Status | Filename |
 |-------|-----------|--------|----------|
-| Store Icon | 128×128 PNG | ✅ Ready | `extension/dist/img/icon.png` |
+| Store Icon | 128×128 PNG | ✅ Ready | `store/store-icon-128.png` (96 px artwork with 16 px padding, per store guidelines) |
 | Screenshot 1 | 1280×800 | ✅ Ready | `store/screenshot-1-catalog.png` |
 | Screenshot 2 | 1280×800 | ✅ Ready | `store/screenshot-2-popup.png` |
 | Screenshot 3 | 1280×800 | ✅ Ready | `store/screenshot-3-dark.png` |
@@ -59,8 +59,9 @@ English
 2. Toolbar popup next to a one-line pitch: per-action switches, per-site mute, volume.
 3. Settings page in dark mode.
 
-Regenerate after UI changes. Icon sources are SVGs in `store/icon-source/` (`icon.svg` for 48 and
-128 px, `icon-small.svg` for the 16 and 32 px toolbar sizes).
+Regenerate after UI changes. Icon sources are SVGs in `store/icon-source/`: `icon-full.svg` for the
+extension's 48 and 128 px icons (edge to edge, so it matches other extensions on chrome://extensions),
+`icon-small.svg` for the 16 and 32 px toolbar sizes, and `icon.svg` for the padded store icon.
 
 ## Permissions Justification
 
