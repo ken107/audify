@@ -337,14 +337,6 @@ body.options {
   color: var(--accent);
 }
 
-.catalog-hint {
-  margin-bottom: 16px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: var(--accent-soft);
-  font-size: 0.8125rem;
-}
-
 .category + .category {
   margin-top: 28px;
 }

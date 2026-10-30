@@ -4,9 +4,14 @@
   let settings: Settings|undefined;
   let lastHovered: Element|null = null;
   let lastHoverTime = 0;
+  //play through the extension's offscreen document, which isn't held back by the page's autoplay
+  //rules, so hover sounds work before the user has clicked anything; play in the page only when
+  //the browser has no offscreen documents (Firefox)
+  let useOffscreen = false;
 
   getSettings().then(applySettings);
   onSettingsChanged(applySettings);
+  checkOffscreen();
 
   //capture phase on window, so pages that stop propagation don't swallow the sound
   addEventListener("pointerdown", onPointerDown, true);
@@ -48,7 +53,29 @@
   function play(kind: ActionKind) {
     if (!settings || !isSiteEnabled(settings, hostname)) return;
     const action = settings.actions[kind];
-    if (action.enabled) player.play(action.soundId);
+    if (!action.enabled) return;
+    if (useOffscreen) playOffscreen(action.soundId, settings);
+    else player.play(action.soundId);
+  }
+
+  async function playOffscreen(soundId: string, {volume, varyPitch}: Settings) {
+    const msg: PlayMessage = {type: "play", soundId, volume, varyPitch, time: Date.now()};
+    try {
+      await chrome.runtime.sendMessage(msg);
+    }
+    catch {
+      player.play(soundId);
+    }
+  }
+
+  async function checkOffscreen() {
+    try {
+      const res = await chrome.runtime.sendMessage({type: "hello"});
+      useOffscreen = res?.offscreen == true;
+    }
+    catch {
+      useOffscreen = false;
+    }
   }
 
   //walk the composed path so buttons inside shadow DOM are found, innermost wins
