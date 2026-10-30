@@ -18,7 +18,7 @@ Audify plays a short, instant sound whenever you press a button on a web page, s
 
 Built for people who rely on sound. Many of us notice a missing click sound more than a missing visual change. Audify gives every button and link the kind of audible response physical controls have, with no noticeable delay.
 
-37 sounds to choose from: crisp ticks, taps, pops, wood blocks, typewriter and keyboard clicks, quiet hover blips, chimes and swooshes for links, and a set of comical sounds such as boink, quack, honk, kazoo and slide whistle.
+47 sounds to choose from: crisp ticks, taps, pops, wood blocks, typewriter and keyboard clicks, quiet hover blips, chimes and swooshes for links, comical sounds such as boink, quack, honk, kazoo and slide whistle, and retro 8-bit bleeps like menu cursors, jumps and power-ups.
 Separate sound choices for button presses, button hovers and link clicks.
 Works with the keyboard too: pressing Enter or Space on a button or link plays its sound.
 Volume control and optional slight pitch variation, so repeated sounds feel natural.
@@ -118,7 +118,7 @@ https://github.com/ken107/audify/blob/master/PRIVACY.md (live once this branch i
 
 | Version | Date | Changes | Status |
 |---------|------|---------|--------|
-| 2.0.0 | 2026-10-30 | Synthesized sound catalog (37 sounds) replaces audio files; hover and link sounds; keyboard support; new popup and settings page; per-site mute; Manifest V3. | Draft |
+| 2.0.0 | 2026-10-30 | Synthesized sound catalog (47 sounds) replaces audio files; hover and link sounds; keyboard support; new popup and settings page; per-site mute; Manifest V3. | Draft |
 
 ## Review Notes
 
