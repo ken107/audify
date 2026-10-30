@@ -29,8 +29,7 @@
     "offscreen"
   ],
   "background": {
-    "service_worker": "js/background.js",
-    "scripts": ["js/background.js"]
+    "service_worker": "js/background.js"
   },
   "content_scripts": [
     {
