@@ -125,6 +125,12 @@
 
   function buildCatalog() {
     if (!catalogBox) return;
+    //browsers only allow audio after the user has interacted with the page once
+    if (!navigator.userActivation?.hasBeenActive) {
+      const hint = el("p", {className: "catalog-hint", textContent: "Click anywhere on this page once, then hover over a sound to hear it."});
+      catalogBox.append(hint);
+      for (const type of ["pointerdown", "keydown"]) addEventListener(type, () => hint.remove(), {once: true});
+    }
     for (const cat of soundCategories) {
       const section = el("section", {className: "category"});
       section.append(
@@ -151,6 +157,12 @@
           assign.append(chip);
           assignChips.push({kind, soundId: sound.id, chip});
         }
+        //hovering a card previews it; a short dwell keeps a fast sweep across the grid from firing every card
+        let dwell: number|undefined;
+        card.addEventListener("pointerenter", e => {
+          if (e.pointerType == "mouse") dwell = setTimeout(() => preview(sound.id), 60);
+        });
+        card.addEventListener("pointerleave", () => clearTimeout(dwell));
         playBtn.addEventListener("click", () => preview(sound.id));
         card.append(playBtn, text, assign);
         grid.append(card);
