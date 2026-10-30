@@ -239,6 +239,34 @@ body.all-off .when-on {
 
 /* ---------- popup */
 
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.notice p {
+  flex: 1;
+  font-size: 0.8125rem;
+}
+.btn {
+  flex: none;
+  min-block-size: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:hover {
+  filter: brightness(1.08);
+}
+
 body.popup {
   width: 340px;
   padding: 14px;

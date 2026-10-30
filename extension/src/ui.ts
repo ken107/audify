@@ -2,7 +2,8 @@
 (async function() {
   const player = new SoundPlayer();
   let settings = await getSettings();
-  const siteHostname = await getActiveTabHostname();
+  const activeTab = await getActiveTab();
+  const siteHostname = activeTab && /^https?:$/.test(activeTab.url.protocol) ? activeTab.url.hostname : undefined;
 
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T|null;
   const enabledInput = $<HTMLInputElement>("enabled");
@@ -23,6 +24,7 @@
   buildActions();
   buildCatalog();
   render();
+  checkActiveTab();
 
   enabledInput?.addEventListener("change", () => update(s => s.enabled = enabledInput.checked));
   siteInput?.addEventListener("change", () => update(s => {
@@ -187,15 +189,44 @@
     return wrap;
   }
 
-  async function getActiveTabHostname() {
+  //popup only; activeTab gives us the tab's URL because the user just clicked our icon
+  async function getActiveTab() {
     if (!document.getElementById("site-row")) return undefined;
     try {
       const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-      const url = new URL(tab?.url ?? "");
-      return /^https?:$/.test(url.protocol) ? url.hostname : undefined;
+      if (tab?.id == null || !tab.url) return undefined;
+      return {id: tab.id, url: new URL(tab.url)};
     }
     catch {
       return undefined;
+    }
+  }
+
+  //Chrome doesn't add content scripts to tabs that were already open when the extension was
+  //installed or updated, so if ours doesn't answer, explain why this page is silent
+  async function checkActiveTab() {
+    const notice = $("tab-notice");
+    if (!notice || !activeTab) return;
+    const {protocol, hostname} = activeTab.url;
+    const isWeb = /^https?:$/.test(protocol) || (protocol == "file:" && await chrome.extension.isAllowedFileSchemeAccess());
+    const isStore = hostname == "chromewebstore.google.com" || (hostname == "chrome.google.com" && activeTab.url.pathname.startsWith("/webstore"));
+    if (!isWeb || isStore) {
+      notice.querySelector("p")!.textContent = "Browser pages like this one can't play Audify sounds. Sounds work on regular websites.";
+      notice.hidden = false;
+      return;
+    }
+    try {
+      await chrome.tabs.sendMessage(activeTab.id, {type: "ping"}, {frameId: 0});
+    }
+    catch {
+      const reloadBtn = el("button", {type: "button", className: "btn", textContent: "Reload page"});
+      reloadBtn.addEventListener("click", async () => {
+        await chrome.tabs.reload(activeTab.id);
+        window.close();
+      });
+      notice.querySelector("p")!.textContent = "This page was opened before Audify was installed or updated. Reload it to hear sounds here.";
+      notice.append(reloadBtn);
+      notice.hidden = false;
     }
   }
 })();

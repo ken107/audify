@@ -12,6 +12,10 @@
   getSettings().then(applySettings);
   onSettingsChanged(applySettings);
   checkOffscreen();
+  //lets the popup tell whether this tab has Audify running or needs a reload
+  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg.type == "ping") sendResponse(true);
+  });
 
   //capture phase on window, so pages that stop propagation don't swallow the sound
   addEventListener("pointerdown", onPointerDown, true);
