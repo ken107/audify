@@ -1,12 +1,11 @@
 {
   "name": "audify",
-  "version": "1.0.0",
-  "description": "Add web browsing sound effects",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "Instant synthesized sound effects for buttons and links on every website",
   "scripts": {
     "compile": "tsc",
-    "build": "rsync -avz dist/ build/",
-    "package": "zip -u -r package.zip build/* || true"
+    "build": "rm -rf build && mkdir -p build && cp -R dist/. build/ && tsc",
+    "package": "rm -f package.zip && npm run build && cd build && zip -r ../package.zip ."
   },
   "repository": {
     "type": "git",
@@ -19,7 +18,7 @@
   },
   "homepage": "https://github.com/ken107/audify#readme",
   "devDependencies": {
-    "@types/chrome": "0.0.91",
-    "typescript": "^3.7.4"
+    "@types/chrome": "^0.3.7",
+    "typescript": "^7.0.2"
   }
 }

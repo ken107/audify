@@ -1,59 +1,41 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
 
   "name": "__MSG_extension_name__",
   "short_name": "__MSG_extension_short_name__",
   "description": "__MSG_extension_description__",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "default_locale": "en",
 
-  "browser_action": {
-    "default_icon": "img/icon.png",
-    "default_popup": "options.html"
+  "action": {
+    "default_icon": {
+      "128": "img/icon.png"
+    },
+    "default_title": "Audify",
+    "default_popup": "popup.html"
   },
   "icons": {
     "128": "img/icon.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab"
   ],
-  "optional_permissions": [
-  ],
-  "content_security_policy": "script-src 'self'; object-src 'self'",
-  "web_accessible_resources": [
-  ],
-  "background": {
-    "scripts": [
-      "js/common.js",
-      "js/background.js"
-    ],
-    "persistent": false
-  },
   "content_scripts": [
     {
-      "run_at": "document_start",
-      "matches": [
-        "http://localhost:8080/my-themes.html",
-        "https://audify.lsdsoftware.com/my-themes.html"
-      ],
-      "js": [
-        "js/common.js",
-        "js/manage-themes.js"
-      ]
-    },
-    {
       "matches": ["<all_urls>"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true,
       "js": [
         "js/common.js",
+        "js/sounds.js",
         "js/content.js"
       ]
     }
   ],
-  "options_page": "options.html",
   "options_ui": {
     "page": "options.html",
-    "chrome_style": false
-  },
-  "commands": {
+    "open_in_tab": true
   }
 }

@@ -1,9 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
     <title>Audify</title>
+    <link rel="stylesheet" href="css/ui.css">
+    <script src="js/common.js" defer></script>
+    <script src="js/sounds.js" defer></script>
+    <script src="js/ui.js" defer></script>
   </head>
-  <body>
-    This is the extension popup
+  <body class="popup">
+    <header class="top">
+      <div class="brand">
+        <img src="img/icon.png" alt="">
+        <div>
+          <h1>Audify</h1>
+          <p>Sound for every click</p>
+        </div>
+      </div>
+      <label class="switch" title="Turn all sounds on or off">
+        <input type="checkbox" id="enabled" role="switch" aria-label="All sounds">
+        <span class="switch-track" aria-hidden="true"></span>
+      </label>
+    </header>
+
+    <div class="when-on">
+      <label class="card row site-row" id="site-row" hidden>
+        <span>Sounds on <b id="site-name"></b></span>
+        <span class="switch">
+          <input type="checkbox" id="site-enabled" role="switch">
+          <span class="switch-track" aria-hidden="true"></span>
+        </span>
+      </label>
+
+      <div class="card" id="actions"></div>
+
+      <div class="card">
+        <div class="row volume">
+          <span>Volume</span>
+          <input type="range" id="volume" min="0" max="100" step="1" aria-label="Volume">
+          <output id="volume-text"></output>
+        </div>
+        <label class="row">
+          <span>Vary pitch slightly</span>
+          <span class="switch">
+            <input type="checkbox" id="vary-pitch" role="switch">
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <footer>
+      <a href="options.html" id="open-catalog">Browse all sounds</a>
+    </footer>
   </body>
 </html>
