@@ -6,7 +6,7 @@
  * sample goes out on the next audio render quantum.
  */
 
-type SoundCategory = "click" | "hover" | "link" | "comic";
+type SoundCategory = "click" | "hover" | "link" | "comic" | "retro";
 
 interface SoundDef {
   id: string;
@@ -21,6 +21,7 @@ const soundCategories: {id: SoundCategory, name: string, description: string}[] 
   {id: "hover", name: "Hovers", description: "Quiet cues that stay out of the way when the mouse passes over"},
   {id: "link", name: "Links", description: "A little more movement, for going somewhere"},
   {id: "comic", name: "Comical", description: "Cartoon sounds, for when the web needs to lighten up"},
+  {id: "retro", name: "Retro", description: "Chiptune bleeps in the style of 8-bit consoles and arcade cabinets"},
 ]
 
 
@@ -74,9 +75,9 @@ class Synth {
     return o;
   }
 
-  noise(to: AudioNode, at = 0) {
+  noise(to: AudioNode, at = 0, buffer = noiseBuffer(this.ctx)) {
     const n = this.ctx.createBufferSource();
-    n.buffer = noiseBuffer(this.ctx);
+    n.buffer = buffer;
     n.loop = true;
     n.connect(to);
     n.start(this.t0 + at, Math.random() * 0.9);
@@ -97,6 +98,25 @@ class Synth {
   glide(param: AudioParam, from: number, to: number, dur: number, at = 0) {
     param.setValueAtTime(this.hz(from), this.t0 + at);
     param.exponentialRampToValueAtTime(this.hz(to), this.t0 + at + dur);
+  }
+
+  /** Pulse wave with the given duty cycle (0.125, 0.25, 0.5), the voice of 8-bit sound chips */
+  pulse(duty: number, freq: number, to: AudioNode, at = 0) {
+    const o = this.osc("square", freq, to, at);
+    o.setPeriodicWave(pulseWave(this.ctx, duty));
+    return o;
+  }
+
+  /** Step a frequency param through a sequence of notes, chip-style (no glide between them) */
+  notes(param: AudioParam, freqs: number[], step: number, at = 0) {
+    freqs.forEach((f, i) => param.setValueAtTime(this.hz(f), this.t0 + at + i * step));
+  }
+
+  /** Coarse 1-bit noise like a chip's noise channel; `rate` (0..1) sets how bright it is */
+  crunch(rate: number, to: AudioNode, at = 0) {
+    const n = this.noise(to, at, crunchBuffer(this.ctx));
+    n.playbackRate.setValueAtTime(rate * this.pitch, this.t0 + at);
+    return n;
   }
 
   /** Vibrato / wobble on a param; depth fades to `endDepth` over `dur` */
@@ -122,6 +142,38 @@ function noiseBuffer(ctx: BaseAudioContext) {
     const data = buf.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
     noiseBuffers.set(ctx, buf);
+  }
+  return buf;
+}
+
+
+const pulseWaves = new WeakMap<BaseAudioContext, Map<number, PeriodicWave>>();
+
+function pulseWave(ctx: BaseAudioContext, duty: number) {
+  let waves = pulseWaves.get(ctx);
+  if (!waves) pulseWaves.set(ctx, waves = new Map());
+  let wave = waves.get(duty);
+  if (!wave) {
+    const real = new Float32Array(64), imag = new Float32Array(64);
+    for (let n = 1; n < 64; n++) real[n] = 2 / (n * Math.PI) * Math.sin(n * Math.PI * duty);
+    waves.set(duty, wave = ctx.createPeriodicWave(real, imag));
+  }
+  return wave;
+}
+
+const crunchBuffers = new WeakMap<BaseAudioContext, AudioBuffer>();
+
+function crunchBuffer(ctx: BaseAudioContext) {
+  let buf = crunchBuffers.get(ctx);
+  if (!buf) {
+    buf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    let v = 1;
+    for (let i = 0; i < data.length; i++) {
+      if (i % 4 == 0) v = Math.random() < 0.5 ? -1 : 1;
+      data[i] = v;
+    }
+    crunchBuffers.set(ctx, buf);
   }
   return buf;
 }
@@ -410,7 +462,7 @@ const soundCatalog: SoundDef[] = [
     }
   },
   {
-    id: "laser", name: "Laser", category: "comic",
+    id: "laser", name: "Laser", category: "retro",
     description: "Pew!",
     render(s) {
       const o = s.osc("square", 1800, s.filter("lowpass", 3000, 1, s.env(0.002, 0.17, 0.25)));
@@ -446,7 +498,7 @@ const soundCatalog: SoundDef[] = [
     }
   },
   {
-    id: "arcade", name: "Arcade", category: "comic",
+    id: "arcade", name: "Arcade", category: "retro",
     description: "A two-note bonus pickup",
     render(s) {
       s.osc("square", 880, s.hold(0.001, 0.055, 0.01, 0.15));
@@ -460,6 +512,88 @@ const soundCatalog: SoundDef[] = [
       const o = s.osc("sine", 400, s.env(0.001, 0.06, 0.6));
       s.glide(o.frequency, 400, 1200, 0.03);
       s.noise(s.filter("bandpass", 1200, 1, s.env(0.001, 0.02, 0.5)));
+    }
+  },
+
+  //---------------------------------------------------------------- retro
+  {
+    id: "cursor", name: "Cursor", category: "retro",
+    description: "Moving the selection in a game menu",
+    render(s) {
+      s.pulse(0.25, 1760, s.hold(0.001, 0.025, 0.01, 0.18));
+    }
+  },
+  {
+    id: "select", name: "Select", category: "retro",
+    description: "Two quick notes confirming a menu choice",
+    render(s) {
+      const o = s.pulse(0.125, 988, s.hold(0.001, 0.08, 0.02, 0.2));
+      s.notes(o.frequency, [988, 1319], 0.04);
+    }
+  },
+  {
+    id: "bleep", name: "Bleep", category: "retro",
+    description: "A tiny chip bleep, quiet enough for hovers",
+    render(s) {
+      s.pulse(0.125, 2093, s.hold(0.001, 0.012, 0.008, 0.1));
+    }
+  },
+  {
+    id: "dialog", name: "Dialog", category: "retro",
+    description: "The beep of text typing out in a game's dialog box",
+    render(s) {
+      s.pulse(0.5, 660, s.hold(0.001, 0.02, 0.01, 0.15));
+    }
+  },
+  {
+    id: "jump", name: "Jump", category: "retro",
+    description: "A platformer hop",
+    render(s) {
+      const o = s.pulse(0.25, 300, s.hold(0.002, 0.1, 0.04, 0.2));
+      s.glide(o.frequency, 300, 760, 0.12);
+    }
+  },
+  {
+    id: "powerup", name: "Power-up", category: "retro",
+    description: "A fast rising arpeggio",
+    render(s) {
+      const o = s.pulse(0.25, 523, s.hold(0.002, 0.2, 0.05, 0.2));
+      s.notes(o.frequency, [523, 659, 784, 1047, 1319, 1568, 2093], 0.03);
+    }
+  },
+  {
+    id: "bounce", name: "Bounce", category: "retro",
+    description: "A ball bouncing off a wall",
+    render(s) {
+      const o = s.osc("triangle", 220, s.hold(0.001, 0.06, 0.03, 0.4));
+      s.glide(o.frequency, 220, 660, 0.03);
+      s.glide(o.frequency, 660, 330, 0.05, 0.03);
+    }
+  },
+  {
+    id: "blaster", name: "Blaster", category: "retro",
+    description: "A short arcade shot",
+    render(s) {
+      const o = s.pulse(0.125, 1400, s.hold(0.001, 0.05, 0.03, 0.2));
+      s.glide(o.frequency, 1400, 260, 0.07);
+      s.crunch(0.5, s.env(0.001, 0.04, 0.1));
+    }
+  },
+  {
+    id: "hit", name: "Hit", category: "retro",
+    description: "Taking damage",
+    render(s) {
+      s.crunch(0.25, s.env(0.001, 0.1, 0.22));
+      const o = s.pulse(0.5, 440, s.hold(0.001, 0.06, 0.04, 0.12));
+      s.notes(o.frequency, [440, 220, 330, 165], 0.025);
+    }
+  },
+  {
+    id: "boom", name: "Boom", category: "retro",
+    description: "An 8-bit explosion",
+    render(s) {
+      const n = s.crunch(0.35, s.filter("lowpass", 4000, 0.7, s.env(0.002, 0.4, 0.45)));
+      n.playbackRate.exponentialRampToValueAtTime(0.04, s.t0 + 0.4);
     }
   },
 ]
