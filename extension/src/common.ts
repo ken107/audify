@@ -36,7 +36,7 @@ const defaultSettings: Settings = {
 //asks the offscreen document to play a sound; see background.ts
 interface PlayMessage {
   type: "play";
-  soundId: string;
+  layers: Layer[];    //the sound itself, so the offscreen document needn't look up custom sounds
   volume: number;
   varyPitch: boolean;
   time: number;   //Date.now() when requested, so a sound that would come out late can be dropped
@@ -72,4 +72,47 @@ function mergeSettings(stored: Partial<Settings>|undefined): Settings {
 
 function isSiteEnabled(settings: Settings, hostname: string) {
   return settings.enabled && !settings.disabledSites.includes(hostname);
+}
+
+
+//Sounds made in the editor live in sync storage, one item per sound (an item can hold 8 KB,
+//a sound is well under 1 KB), so they follow the user to their other browsers like settings do
+const customSoundPrefix = "sound:";
+const customSoundIdPrefix = "custom-";
+
+async function getCustomSounds(): Promise<Map<string, Sound>> {
+  const items = await chrome.storage.sync.get(null);
+  const sounds = new Map<string, Sound>();
+  for (const [key, value] of Object.entries(items)) {
+    if (key.startsWith(customSoundPrefix)) {
+      const sound = parseCustomSound(value);
+      if (sound) sounds.set(sound.id, sound);
+    }
+  }
+  return sounds;
+}
+
+function saveCustomSound(sound: Sound): Promise<void> {
+  return chrome.storage.sync.set({[customSoundPrefix + sound.id]: sound});
+}
+
+function deleteCustomSound(id: string): Promise<void> {
+  return chrome.storage.sync.remove(customSoundPrefix + id);
+}
+
+function onCustomSoundsChanged(listener: () => void) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area == "sync" && Object.keys(changes).some(key => key.startsWith(customSoundPrefix))) listener();
+  })
+}
+
+function newCustomSoundId() {
+  return customSoundIdPrefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function parseCustomSound(value: any): Sound|undefined {
+  if (!value || typeof value.id != "string" || !value.id.startsWith(customSoundIdPrefix)) return undefined;
+  const layers = sanitizeLayers(value.layers);
+  if (!layers.length) return undefined;
+  return {id: value.id, name: String(value.name || "Untitled sound").slice(0, 60), layers};
 }
