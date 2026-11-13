@@ -2,6 +2,7 @@
   const player = new SoundPlayer();
   const hostname = topHostname();
   let settings: Settings|undefined;
+  let customSounds = new Map<string, Sound>();
   let lastHovered: Element|null = null;
   let lastHoverTime = 0;
   //play through the extension's offscreen document, which isn't held back by the page's autoplay
@@ -11,6 +12,8 @@
 
   getSettings().then(applySettings);
   onSettingsChanged(applySettings);
+  loadCustomSounds();
+  onCustomSoundsChanged(loadCustomSounds);
   checkOffscreen();
   //lets the popup tell whether this tab has Audify running or needs a reload
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -22,6 +25,10 @@
   addEventListener("keydown", onKeyDown, true);
   addEventListener("pointerover", onPointerOver, true);
 
+
+  async function loadCustomSounds() {
+    customSounds = await getCustomSounds();
+  }
 
   function applySettings(value: Settings) {
     settings = value;
@@ -58,17 +65,20 @@
     if (!settings || !isSiteEnabled(settings, hostname)) return;
     const action = settings.actions[kind];
     if (!action.enabled) return;
-    if (useOffscreen) playOffscreen(action.soundId, settings);
-    else player.play(action.soundId);
+    //a custom sound that was deleted, or hasn't synced to this browser yet, falls back to the default
+    const sound = findSound(action.soundId, customSounds) ?? findSound(defaultSettings.actions[kind].soundId, customSounds);
+    if (!sound) return;
+    if (useOffscreen) playOffscreen(sound.layers, settings);
+    else player.play(sound.layers);
   }
 
-  async function playOffscreen(soundId: string, {volume, varyPitch}: Settings) {
-    const msg: PlayMessage = {type: "play", soundId, volume, varyPitch, time: Date.now()};
+  async function playOffscreen(layers: Layer[], {volume, varyPitch}: Settings) {
+    const msg: PlayMessage = {type: "play", layers, volume, varyPitch, time: Date.now()};
     try {
       await chrome.runtime.sendMessage(msg);
     }
     catch {
-      player.play(soundId);
+      player.play(layers);
     }
   }
 

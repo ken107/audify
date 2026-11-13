@@ -11,8 +11,16 @@ envelopes). There are no audio files, so there's no fetch, no decode, and no sil
 a sample. Sounds are triggered on `pointerdown` (and Enter/Space for keyboard users) rather than on
 `click`, which is what makes them feel immediate.
 
-The catalog lives in [`extension/src/sounds.ts`](extension/src/sounds.ts). Each entry is a small
-`render(synth)` function; adding a sound means adding an entry there.
+The catalog lives in [`extension/src/sounds.ts`](extension/src/sounds.ts). Each sound is plain data:
+a stack of layers, where a layer is a source (sine, triangle, square, saw, pulse, noise or chip
+"crunch" noise) with an optional pitch slide, arpeggio or vibrato, an optional swept filter, and a
+volume envelope. Adding a sound means adding an entry there.
+
+Users can make their own sounds in the sound editor on the options page, starting from scratch or
+from a copy of any catalog sound. The editor uses the same layer format, draws the waveform as you
+change it, and plays the sound when you let go of a control. Custom sounds are saved in
+`chrome.storage.sync` (one item per sound) and can be used for button clicks, link clicks and hover
+like any catalog sound.
 
 ## Building
 

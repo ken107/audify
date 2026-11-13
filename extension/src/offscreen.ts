@@ -7,6 +7,6 @@
     if (Date.now() - msg.time > 250) return;
     player.volume = msg.volume;
     player.varyPitch = msg.varyPitch;
-    player.play(msg.soundId);
+    player.play(sanitizeLayers(msg.layers));
   })
 })();
